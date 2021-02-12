@@ -12,7 +12,7 @@ Launch Microsoft Edge with ease from node.
 * Binds `Ctrl-C` (by default) to terminate the Edge process
 * Exposes a small set of [options](#api) for configurability over these details
 
-> _This project started as a fork of [Chrome Launcher](https://github.com/GoogleChrome/chrome-launcher) and inherits, whereas possible, all its features but many untested in real-case scenarios. If you see a bug, please open an issue._
+> _This project started as a fork of [Chrome Launcher](https://github.com/GoogleChrome/chrome-launcher) and inherits, whereas possible, all its features.
 
 ### Installing
 
