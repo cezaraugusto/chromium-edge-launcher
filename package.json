@@ -29,10 +29,10 @@
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2"
   },
-  "version": "0.13.4",
+  "version": "0.0.0",
   "types": "./dist/index.d.ts",
   "description": "Launch latest Edge with the Devtools Protocol port open",
   "repository": "https://github.com/cezaraugusto/chromium-edge-launcher/",
-  "author": "The Chromium Authors",
+  "author": "Cezar Augusto",
   "license": "Apache-2.0"
 }
