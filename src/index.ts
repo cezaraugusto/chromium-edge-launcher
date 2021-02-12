@@ -1,1 +1,1 @@
-export * from './chrome-launcher';
+export * from './edge-launcher';

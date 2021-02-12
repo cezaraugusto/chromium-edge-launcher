@@ -5,7 +5,7 @@
  */
 'use strict';
 
-import {Launcher, launch, killAll, Options} from '../src/chrome-launcher';
+import {Launcher, launch, killAll, Options} from '../src/edge-launcher';
 import {DEFAULT_FLAGS} from '../src/flags';
 
 import {spy, stub} from 'sinon';
@@ -18,17 +18,17 @@ const fsMock = {
   writeFileSync: () => {}
 };
 
-const launchChromeWithOpts = async (opts: Options = {}) => {
+const launchEdgeWithOpts = async (opts: Options = {}) => {
   const spawnStub = stub().returns({pid: 'some_pid'});
 
-  const chromeInstance =
+  const edgeInstance =
       new Launcher(opts, {fs: fsMock as any, rimraf: spy() as any, spawn: spawnStub as any});
-  stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve());
+  stub(edgeInstance, 'waitUntilReady').returns(Promise.resolve());
 
-  chromeInstance.prepare();
+  edgeInstance.prepare();
 
   try {
-    await chromeInstance.launch();
+    await edgeInstance.launch();
     return Promise.resolve(spawnStub);
   } catch (err) {
     return Promise.reject(err);
@@ -45,57 +45,57 @@ describe('Launcher', () => {
   });
 
   it('sets default launching flags', async () => {
-    const spawnStub = await launchChromeWithOpts({userDataDir: 'some_path'});
-    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
-    assert.ok(chromeFlags.find(f => f.startsWith('--remote-debugging-port')))
-    assert.ok(chromeFlags.find(f => f.startsWith('--disable-background-networking')))
-    assert.strictEqual(chromeFlags[chromeFlags.length - 1], 'about:blank');
+    const spawnStub = await launchEdgeWithOpts({userDataDir: 'some_path'});
+    const edgeFlags = spawnStub.getCall(0).args[1] as string[];
+    assert.ok(edgeFlags.find(f => f.startsWith('--remote-debugging-port')))
+    assert.ok(edgeFlags.find(f => f.startsWith('--disable-background-networking')))
+    assert.strictEqual(edgeFlags[edgeFlags.length - 1], 'about:blank');
   });
 
   it('accepts and uses a custom path', async () => {
     const rimrafMock = spy();
-    const chromeInstance =
+    const edgeInstance =
         new Launcher({userDataDir: 'some_path'}, {fs: fsMock as any, rimraf: rimrafMock as any});
 
-    chromeInstance.prepare();
+    edgeInstance.prepare();
 
-    await chromeInstance.destroyTmp();
+    await edgeInstance.destroyTmp();
     assert.strictEqual(rimrafMock.callCount, 0);
   });
 
   it('cleans up the tmp dir after closing', async () => {
     const rimrafMock = stub().callsFake((_, done) => done());
 
-    const chromeInstance = new Launcher({}, {fs: fsMock as any, rimraf: rimrafMock as any});
+    const edgeInstance = new Launcher({}, {fs: fsMock as any, rimraf: rimrafMock as any});
 
-    chromeInstance.prepare();
-    await chromeInstance.destroyTmp();
+    edgeInstance.prepare();
+    await edgeInstance.destroyTmp();
     assert.strictEqual(rimrafMock.callCount, 1);
   });
 
   it('does not delete created directory when custom path passed', () => {
-    const chromeInstance = new Launcher({userDataDir: 'some_path'}, {fs: fsMock as any});
+    const edgeInstance = new Launcher({userDataDir: 'some_path'}, {fs: fsMock as any});
 
-    chromeInstance.prepare();
-    assert.strictEqual(chromeInstance.userDataDir, 'some_path');
+    edgeInstance.prepare();
+    assert.strictEqual(edgeInstance.userDataDir, 'some_path');
   });
 
   it('defaults to genering a tmp dir when no data dir is passed', () => {
-    const chromeInstance = new Launcher({}, {fs: fsMock as any});
-    const originalMakeTmp = chromeInstance.makeTmpDir;
-    chromeInstance.makeTmpDir = () => 'tmp_dir'
-    chromeInstance.prepare()
-    assert.strictEqual(chromeInstance.userDataDir, 'tmp_dir');
+    const edgeInstance = new Launcher({}, {fs: fsMock as any});
+    const originalMakeTmp = edgeInstance.makeTmpDir;
+    edgeInstance.makeTmpDir = () => 'tmp_dir'
+    edgeInstance.prepare()
+    assert.strictEqual(edgeInstance.userDataDir, 'tmp_dir');
 
     // Restore the original fn.
-    chromeInstance.makeTmpDir = originalMakeTmp;
+    edgeInstance.makeTmpDir = originalMakeTmp;
   });
 
   it('doesn\'t fail when killed twice', async () => {
-    const chromeInstance = new Launcher();
-    await chromeInstance.launch();
-    await chromeInstance.kill();
-    await chromeInstance.kill();
+    const edgeInstance = new Launcher();
+    await edgeInstance.launch();
+    await edgeInstance.kill();
+    await edgeInstance.kill();
   }).timeout(30 * 1000);
 
   it('doesn\'t fail when killing all instances', async () => {
@@ -105,13 +105,13 @@ describe('Launcher', () => {
     assert.strictEqual(errors.length, 0);
   });
 
-  it('doesn\'t launch multiple chrome processes', async () => {
-    const chromeInstance = new Launcher();
-    await chromeInstance.launch();
-    let pid = chromeInstance.pid!;
-    await chromeInstance.launch();
-    assert.strictEqual(pid, chromeInstance.pid);
-    await chromeInstance.kill();
+  it('doesn\'t launch multiple edge processes', async () => {
+    const edgeInstance = new Launcher();
+    await edgeInstance.launch();
+    let pid = edgeInstance.pid!;
+    await edgeInstance.launch();
+    assert.strictEqual(pid, edgeInstance.pid);
+    await edgeInstance.kill();
   });
 
   it('gets all default flags', async () => {
@@ -129,15 +129,15 @@ describe('Launcher', () => {
 
   it('does not mutate default flags when launching', async () => {
     const originalDefaultFlags = Launcher.defaultFlags().slice();
-    await launchChromeWithOpts();
+    await launchEdgeWithOpts();
     const currentDefaultFlags = Launcher.defaultFlags().slice();
     assert.deepStrictEqual(originalDefaultFlags, currentDefaultFlags);
   });
 
   it('removes all default flags', async () => {
-    const spawnStub = await launchChromeWithOpts({ignoreDefaultFlags: true});
-    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
-    assert.ok(!chromeFlags.includes('--disable-extensions'));
+    const spawnStub = await launchEdgeWithOpts({ignoreDefaultFlags: true});
+    const edgeFlags = spawnStub.getCall(0).args[1] as string[];
+    assert.ok(!edgeFlags.includes('--disable-extensions'));
   });
 
   it('searches for available installations', async () => {
@@ -147,40 +147,40 @@ describe('Launcher', () => {
   });
 
   it('removes --user-data-dir if userDataDir is false', async () => {
-    const spawnStub = await launchChromeWithOpts();
-    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
-    assert.ok(!chromeFlags.includes('--user-data-dir'));
+    const spawnStub = await launchEdgeWithOpts();
+    const edgeFlags = spawnStub.getCall(0).args[1] as string[];
+    assert.ok(!edgeFlags.includes('--user-data-dir'));
   });
 
   it('passes no env vars when none are passed', async () => {
-    const spawnStub = await launchChromeWithOpts();
+    const spawnStub = await launchEdgeWithOpts();
     const spawnOptions = spawnStub.getCall(0).args[2] as {env: {}};
     assert.deepStrictEqual(spawnOptions.env, Object.assign({}, process.env));
   });
 
   it('passes env vars when passed', async () => {
     const envVars = {'hello': 'world'};
-    const spawnStub = await launchChromeWithOpts({envVars});
+    const spawnStub = await launchEdgeWithOpts({envVars});
     const spawnOptions = spawnStub.getCall(0).args[2] as {env: {}};
     assert.deepStrictEqual(spawnOptions.env, envVars);
   });
 
   it('ensure specific flags are present when passed and defaults are ignored', async () => {
-    const spawnStub = await launchChromeWithOpts({
+    const spawnStub = await launchEdgeWithOpts({
       ignoreDefaultFlags: true,
-      chromeFlags: ['--disable-extensions', '--mute-audio', '--no-first-run']
+      edgeFlags: ['--disable-extensions', '--mute-audio', '--no-first-run']
     });
-    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
-    assert.ok(chromeFlags.includes('--mute-audio'));
-    assert.ok(chromeFlags.includes('--disable-extensions'));
+    const edgeFlags = spawnStub.getCall(0).args[1] as string[];
+    assert.ok(edgeFlags.includes('--mute-audio'));
+    assert.ok(edgeFlags.includes('--disable-extensions'));
 
     // Make sure that default flags are not present
-    assert.ok(!chromeFlags.includes('--disable-background-networking'));
-    assert.ok(!chromeFlags.includes('--disable-default-app'));
+    assert.ok(!edgeFlags.includes('--disable-background-networking'));
+    assert.ok(!edgeFlags.includes('--disable-default-app'));
   });
 
-  it('throws an error when chromePath is empty', (done) => {
-    const chromeInstance = new Launcher({chromePath: ''});
-    chromeInstance.launch().catch(() => done());
+  it('throws an error when edgePath is empty', (done) => {
+    const edgeInstance = new Launcher({edgePath: ''});
+    edgeInstance.launch().catch(() => done());
   });
 });

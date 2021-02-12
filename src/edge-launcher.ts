@@ -9,10 +9,10 @@ import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as net from 'net';
 import * as rimraf from 'rimraf';
-import * as chromeFinder from './chrome-finder';
+import * as edgeFinder from './edge-finder';
 import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
-import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils';
+import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat, InvalidUserDataDirectoryError, UnsupportedPlatformError, EdgeNotInstalledError} from './utils';
 import {ChildProcess} from 'child_process';
 const log = require('lighthouse-logger');
 const spawn = childProcess.spawn;
@@ -31,10 +31,10 @@ export type RimrafModule = (path: string, callback: (error: Error) => void) => v
 
 export interface Options {
   startingUrl?: string;
-  chromeFlags?: Array<string>;
+  edgeFlags?: Array<string>;
   port?: number;
   handleSIGINT?: boolean;
-  chromePath?: string;
+  edgePath?: string;
   userDataDir?: string|boolean;
   logLevel?: 'verbose'|'info'|'error'|'silent';
   ignoreDefaultFlags?: boolean;
@@ -43,7 +43,7 @@ export interface Options {
   envVars?: {[key: string]: string|undefined};
 }
 
-export interface LaunchedChrome {
+export interface LaunchedEdge {
   pid: number;
   port: number;
   process: ChildProcess;
@@ -61,12 +61,12 @@ const sigintListener = async () => {
   process.exit(_SIGINT_EXIT_CODE);
 };
 
-async function launch(opts: Options = {}): Promise<LaunchedChrome> {
+async function launch(opts: Options = {}): Promise<LaunchedEdge> {
   opts.handleSIGINT = defaults(opts.handleSIGINT, true);
 
   const instance = new Launcher(opts);
 
-  // Kill spawned Chrome process in case of ctrl-C.
+  // Kill spawned Edge process in case of ctrl-C.
   if (opts.handleSIGINT && instances.size === 0) {
     process.on(_SIGINT, sigintListener);
   }
@@ -82,7 +82,7 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
     return instance.kill();
   };
 
-  return {pid: instance.pid!, port: instance.port!, kill, process: instance.chrome!};
+  return {pid: instance.pid!, port: instance.port!, kill, process: instance.edge!};
 }
 
 async function killAll(): Promise<Array<Error>> {
@@ -106,9 +106,9 @@ class Launcher {
   private startingUrl: string;
   private outFile?: number;
   private errFile?: number;
-  private chromePath?: string;
+  private edgePath?: string;
   private ignoreDefaultFlags?: boolean;
-  private chromeFlags: string[];
+  private edgeFlags: string[];
   private requestedPort?: number;
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
@@ -118,7 +118,7 @@ class Launcher {
   private useDefaultProfile: boolean;
   private envVars: {[key: string]: string|undefined};
 
-  chrome?: childProcess.ChildProcess;
+  edge?: childProcess.ChildProcess;
   userDataDir?: string;
   port?: number;
   pid?: number;
@@ -132,9 +132,9 @@ class Launcher {
 
     // choose the first one (default)
     this.startingUrl = defaults(this.opts.startingUrl, 'about:blank');
-    this.chromeFlags = defaults(this.opts.chromeFlags, []);
+    this.edgeFlags = defaults(this.opts.edgeFlags, []);
     this.requestedPort = defaults(this.opts.port, 0);
-    this.chromePath = this.opts.chromePath;
+    this.edgePath = this.opts.edgePath;
     this.ignoreDefaultFlags = defaults(this.opts.ignoreDefaultFlags, false);
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
     this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
@@ -162,12 +162,12 @@ class Launcher {
     }
 
     if (!this.useDefaultProfile) {
-      // Place Chrome profile in a custom location we'll rm -rf later
+      // Place Edge profile in a custom location we'll rm -rf later
       // If in WSL, we need to use the Windows format
       flags.push(`--user-data-dir=${isWsl ? toWinDirFormat(this.userDataDir) : this.userDataDir}`);
     }
 
-    flags.push(...this.chromeFlags);
+    flags.push(...this.edgeFlags);
     flags.push(this.startingUrl);
 
     return flags;
@@ -177,15 +177,15 @@ class Launcher {
     return DEFAULT_FLAGS.slice();
   }
 
-  /** Returns the highest priority chrome installation. */
+  /** Returns the highest priority edge installation. */
   static getFirstInstallation() {
-    if (getPlatform() === 'darwin') return chromeFinder.darwinFast();
-    return chromeFinder[getPlatform() as SupportedPlatforms]()[0];
+    if (getPlatform() === 'darwin') return edgeFinder.darwinFast();
+    return edgeFinder[getPlatform() as SupportedPlatforms]()[0];
   }
 
-  /** Returns all available chrome installations in decreasing priority order. */
+  /** Returns all available edge installations in decreasing priority order. */
   static getInstallations() {
-    return chromeFinder[getPlatform() as SupportedPlatforms]();
+    return edgeFinder[getPlatform() as SupportedPlatforms]();
   }
 
   // Wrapper function to enable easy testing.
@@ -200,14 +200,14 @@ class Launcher {
     }
 
     this.userDataDir = this.userDataDir || this.makeTmpDir();
-    this.outFile = this.fs.openSync(`${this.userDataDir}/chrome-out.log`, 'a');
-    this.errFile = this.fs.openSync(`${this.userDataDir}/chrome-err.log`, 'a');
+    this.outFile = this.fs.openSync(`${this.userDataDir}/edge-out.log`, 'a');
+    this.errFile = this.fs.openSync(`${this.userDataDir}/edge-err.log`, 'a');
 
     // fix for Node4
     // you can't pass a fd to fs.writeFileSync
-    this.pidFile = `${this.userDataDir}/chrome.pid`;
+    this.pidFile = `${this.userDataDir}/edge.pid`;
 
-    log.verbose('ChromeLauncher', `created ${this.userDataDir}`);
+    log.verbose('EdgeLauncher', `created ${this.userDataDir}`);
 
     this.tmpDirandPidFileReady = true;
   }
@@ -221,54 +221,54 @@ class Launcher {
         return await this.isDebuggerReady();
       } catch (err) {
         log.log(
-            'ChromeLauncher',
-            `No debugging port found on port ${this.port}, launching a new Chrome.`);
+            'EdgeLauncher',
+            `No debugging port found on port ${this.port}, launching a new Edge.`);
       }
     }
-    if (this.chromePath === undefined) {
+    if (this.edgePath === undefined) {
       const installation = Launcher.getFirstInstallation();
       if (!installation) {
-        throw new ChromeNotInstalledError();
+        throw new EdgeNotInstalledError();
       }
 
-      this.chromePath = installation;
+      this.edgePath = installation;
     }
 
     if (!this.tmpDirandPidFileReady) {
       this.prepare();
     }
 
-    this.pid = await this.spawnProcess(this.chromePath);
+    this.pid = await this.spawnProcess(this.edgePath);
     return Promise.resolve();
   }
 
   private async spawnProcess(execPath: string) {
     const spawnPromise = (async () => {
-      if (this.chrome) {
-        log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
-        return this.chrome.pid;
+      if (this.edge) {
+        log.log('EdgeLauncher', `Edge already running with pid ${this.edge.pid}.`);
+        return this.edge.pid;
       }
 
 
       // If a zero value port is set, it means the launcher
       // is responsible for generating the port number.
       // We do this here so that we can know the port before
-      // we pass it into chrome.
+      // we pass it into edge.
       if (this.requestedPort === 0) {
         this.port = await getRandomPort();
       }
 
       log.verbose(
-          'ChromeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
-      const chrome = this.spawn(
+          'EdgeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
+      const edge = this.spawn(
           execPath, this.flags,
           {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
-      this.chrome = chrome;
+      this.edge = edge;
 
-      this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
+      this.fs.writeFileSync(this.pidFile, edge.pid.toString());
 
-      log.verbose('ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
-      return chrome.pid;
+      log.verbose('EdgeLauncher', `Edge running with pid ${edge.pid} on port ${this.port}.`);
+      return edge.pid;
     })();
 
     const pid = await spawnPromise;
@@ -310,25 +310,25 @@ class Launcher {
 
       const poll = () => {
         if (retries === 0) {
-          log.log('ChromeLauncher', waitStatus);
+          log.log('EdgeLauncher', waitStatus);
         }
         retries++;
         waitStatus += '..';
-        log.log('ChromeLauncher', waitStatus);
+        log.log('EdgeLauncher', waitStatus);
 
         launcher.isDebuggerReady()
             .then(() => {
-              log.log('ChromeLauncher', waitStatus + `${log.greenify(log.tick)}`);
+              log.log('EdgeLauncher', waitStatus + `${log.greenify(log.tick)}`);
               resolve();
             })
             .catch(err => {
               if (retries > launcher.maxConnectionRetries) {
-                log.error('ChromeLauncher', err.message);
+                log.error('EdgeLauncher', err.message);
                 const stderr =
-                    this.fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
+                    this.fs.readFileSync(`${this.userDataDir}/edge-err.log`, {encoding: 'utf-8'});
                 log.error(
-                    'ChromeLauncher', `Logging contents of ${this.userDataDir}/chrome-err.log`);
-                log.error('ChromeLauncher', stderr);
+                    'EdgeLauncher', `Logging contents of ${this.userDataDir}/edge-err.log`);
+                log.error('EdgeLauncher', stderr);
                 return reject(err);
               }
               delay(launcher.connectionPollInterval).then(poll);
@@ -340,28 +340,28 @@ class Launcher {
 
   kill() {
     return new Promise<void>((resolve, reject) => {
-      if (this.chrome) {
-        this.chrome.on('close', () => {
-          delete this.chrome;
+      if (this.edge) {
+        this.edge.on('close', () => {
+          delete this.edge;
           this.destroyTmp().then(resolve);
         });
 
-        log.log('ChromeLauncher', `Killing Chrome instance ${this.chrome.pid}`);
+        log.log('EdgeLauncher', `Killing Edge instance ${this.edge.pid}`);
         try {
           if (isWindows) {
             // While pipe is the default, stderr also gets printed to process.stderr
             // if you don't explicitly set `stdio`
-            execSync(`taskkill /pid ${this.chrome.pid} /T /F`, {stdio: 'pipe'});
+            execSync(`taskkill /pid ${this.edge.pid} /T /F`, {stdio: 'pipe'});
           } else {
-            process.kill(-this.chrome.pid);
+            process.kill(-this.edge.pid);
           }
         } catch (err) {
-          const message = `Chrome could not be killed ${err.message}`;
-          log.warn('ChromeLauncher', message);
+          const message = `Edge could not be killed ${err.message}`;
+          log.warn('EdgeLauncher', message);
           reject(new Error(message));
         }
       } else {
-        // fail silently as we did not start chrome
+        // fail silently as we did not start edge
         resolve();
       }
     });

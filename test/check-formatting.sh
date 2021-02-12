@@ -6,7 +6,7 @@ check_formatting ()
   if [ $? -eq 1 ]
   then
     echo "Error: formatting is required for *.ts files:"
-    echo "    cd chrome-launcher"
+    echo "    cd edge-launcher"
     echo "    yarn format"
     exit 1
   fi

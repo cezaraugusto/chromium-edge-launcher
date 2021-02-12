@@ -12,7 +12,7 @@ import {execSync, execFileSync} from 'child_process';
 import escapeRegExp = require('escape-string-regexp');
 const log = require('lighthouse-logger');
 
-import {getLocalAppDataPath, ChromePathNotSetError} from './utils';
+import {getLocalAppDataPath, EdgePathNotSetError} from './utils';
 
 const newLineRegex = /\r?\n/;
 
@@ -23,21 +23,20 @@ type Priorities = Array<{regex: RegExp, weight: number}>;
  */
 export function darwinFast(): string|undefined {
   const priorityOptions: Array<string|undefined> = [
-    process.env.CHROME_PATH,
+    process.env.EDGE_PATH,
     process.env.LIGHTHOUSE_CHROMIUM_PATH,
-    '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
   ];
 
-  for (const chromePath of priorityOptions) {
-    if (chromePath && canAccess(chromePath)) return chromePath;
+  for (const edgePath of priorityOptions) {
+    if (edgePath && canAccess(edgePath)) return edgePath;
   }
 
   return darwin()[0]
 }
 
 export function darwin() {
-  const suffixes = ['/Contents/MacOS/Google Chrome Canary', '/Contents/MacOS/Google Chrome'];
+  const suffixes = ['/Contents/MacOS/Google Edge'];
 
   const LSREGISTER = '/System/Library/Frameworks/CoreServices.framework' +
       '/Versions/A/Frameworks/LaunchServices.framework' +
@@ -45,14 +44,14 @@ export function darwin() {
 
   const installations: Array<string> = [];
 
-  const customChromePath = resolveChromePath();
-  if (customChromePath) {
-    installations.push(customChromePath);
+  const customEdgePath = resolveEdgePath();
+  if (customEdgePath) {
+    installations.push(customEdgePath);
   }
 
   execSync(
       `${LSREGISTER} -dump` +
-      ' | grep -i \'google chrome\\( canary\\)\\?\\.app\'' +
+      ' | grep -i \'microsoft edge\\?\\.app\'' +
       ' | awk \'{$1=""; print $0}\'')
       .toString()
       .split(newLineRegex)
@@ -70,35 +69,32 @@ export function darwin() {
   // clang-format off
   const home = escapeRegExp(process.env.HOME || homedir());
   const priorities: Priorities = [
-    {regex: new RegExp(`^${home}/Applications/.*Chrome\\.app`), weight: 50},
-    {regex: new RegExp(`^${home}/Applications/.*Chrome Canary\\.app`), weight: 51},
-    {regex: /^\/Applications\/.*Chrome.app/, weight: 100},
-    {regex: /^\/Applications\/.*Chrome Canary.app/, weight: 101},
-    {regex: /^\/Volumes\/.*Chrome.app/, weight: -2},
-    {regex: /^\/Volumes\/.*Chrome Canary.app/, weight: -1},
+    {regex: new RegExp(`^${home}/Applications/.*Edge\\.app`), weight: 50},
+    {regex: /^\/Applications\/.*Edge.app/, weight: 100},
+    {regex: /^\/Volumes\/.*Edge.app/, weight: -2},
   ];
 
   if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
     priorities.unshift({regex: new RegExp(escapeRegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH)), weight: 150});
   }
 
-  if (process.env.CHROME_PATH) {
-    priorities.unshift({regex: new RegExp(escapeRegExp(process.env.CHROME_PATH)), weight: 151});
+  if (process.env.EDGE_PATH) {
+    priorities.unshift({regex: new RegExp(escapeRegExp(process.env.EDGE_PATH)), weight: 151});
   }
 
   // clang-format on
   return sort(installations, priorities);
 }
 
-function resolveChromePath() {
-  if (canAccess(process.env.CHROME_PATH)) {
-    return process.env.CHROME_PATH;
+function resolveEdgePath() {
+  if (canAccess(process.env.EDGE_PATH)) {
+    return process.env.EDGE_PATH;
   }
 
   if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
     log.warn(
-        'ChromeLauncher',
-        'LIGHTHOUSE_CHROMIUM_PATH is deprecated, use CHROME_PATH env variable instead.');
+        'EdgeLauncher',
+        'LIGHTHOUSE_CHROMIUM_PATH is deprecated, use EDGE_PATH env variable instead.');
     return process.env.LIGHTHOUSE_CHROMIUM_PATH;
   }
 
@@ -107,17 +103,17 @@ function resolveChromePath() {
 
 /**
  * Look for linux executables in 3 ways
- * 1. Look into CHROME_PATH env variable
+ * 1. Look into EDGE_PATH env variable
  * 2. Look into the directories where .desktop are saved on gnome based distro's
- * 3. Look for google-chrome-stable & google-chrome executables by using the which command
+ * 3. Look for microsoft-edge-stable & microsoft-edge executables by using the which command
  */
 export function linux() {
   let installations: string[] = [];
 
-  // 1. Look into CHROME_PATH env variable
-  const customChromePath = resolveChromePath();
-  if (customChromePath) {
-    installations.push(customChromePath);
+  // 1. Look into EDGE_PATH env variable
+  const customEdgePath = resolveEdgePath();
+  if (customEdgePath) {
+    installations.push(customEdgePath);
   }
 
   // 2. Look into the directories where .desktop are saved on gnome based distro's
@@ -126,23 +122,23 @@ export function linux() {
     '/usr/share/applications/',
   ];
   desktopInstallationFolders.forEach(folder => {
-    installations = installations.concat(findChromeExecutables(folder));
+    installations = installations.concat(findEdgeExecutables(folder));
   });
 
-  // Look for google-chrome(-stable) & chromium(-browser) executables by using the which command
+  // Look for microsoft-edge(-stable) & chromium(-browser) executables by using the which command
   const executables = [
-    'google-chrome-stable',
-    'google-chrome',
+    'microsoft-edge-stable',
+    'microsoft-edge',
     'chromium-browser',
     'chromium',
   ];
   executables.forEach((executable: string) => {
     try {
-      const chromePath =
+      const edgePath =
           execFileSync('which', [executable], {stdio: 'pipe'}).toString().split(newLineRegex)[0];
 
-      if (canAccess(chromePath)) {
-        installations.push(chromePath);
+      if (canAccess(edgePath)) {
+        installations.push(edgePath);
       }
     } catch (e) {
       // Not installed.
@@ -150,15 +146,15 @@ export function linux() {
   });
 
   if (!installations.length) {
-    throw new ChromePathNotSetError();
+    throw new EdgePathNotSetError();
   }
 
   const priorities: Priorities = [
-    {regex: /chrome-wrapper$/, weight: 51},
-    {regex: /google-chrome-stable$/, weight: 50},
-    {regex: /google-chrome$/, weight: 49},
-    {regex: /chromium-browser$/, weight: 48},
-    {regex: /chromium$/, weight: 47},
+    {regex: /edge-wrapper$/, weight: 51},
+    {regex: /microsoft-edge-stable$/, weight: 50},
+    {regex: /microsoft-edge$/, weight: 49},
+    {regex: /edge-browser$/, weight: 48},
+    {regex: /edge$/, weight: 47},
   ];
 
   if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
@@ -166,8 +162,8 @@ export function linux() {
         {regex: new RegExp(escapeRegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH)), weight: 100});
   }
 
-  if (process.env.CHROME_PATH) {
-    priorities.unshift({regex: new RegExp(escapeRegExp(process.env.CHROME_PATH)), weight: 101});
+  if (process.env.EDGE_PATH) {
+    priorities.unshift({regex: new RegExp(escapeRegExp(process.env.EDGE_PATH)), weight: 101});
   }
 
   return sort(uniq(installations.filter(Boolean)), priorities);
@@ -185,22 +181,22 @@ export function wsl() {
 export function win32() {
   const installations: Array<string> = [];
   const suffixes = [
-    `${path.sep}Google${path.sep}Chrome SxS${path.sep}Application${path.sep}chrome.exe`,
-    `${path.sep}Google${path.sep}Chrome${path.sep}Application${path.sep}chrome.exe`
+    `${path.sep}Microsoft${path.sep}Edge SxS${path.sep}Application${path.sep}edge.exe`,
+    `${path.sep}Microsoft${path.sep}Edge${path.sep}Application${path.sep}edge.exe`
   ];
   const prefixes = [
     process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']
   ].filter(Boolean) as string[];
 
-  const customChromePath = resolveChromePath();
-  if (customChromePath) {
-    installations.push(customChromePath);
+  const customEdgePath = resolveEdgePath();
+  if (customEdgePath) {
+    installations.push(customEdgePath);
   }
 
   prefixes.forEach(prefix => suffixes.forEach(suffix => {
-    const chromePath = path.join(prefix, suffix);
-    if (canAccess(chromePath)) {
-      installations.push(chromePath);
+    const edgePath = path.join(prefix, suffix);
+    if (canAccess(edgePath)) {
+      installations.push(edgePath);
     }
   }));
   return installations;
@@ -241,25 +237,25 @@ function uniq(arr: Array<any>) {
   return Array.from(new Set(arr));
 }
 
-function findChromeExecutables(folder: string): Array<string> {
+function findEdgeExecutables(folder: string): Array<string> {
   const argumentsRegex = /(^[^ ]+).*/; // Take everything up to the first space
-  const chromeExecRegex = '^Exec=\/.*\/(google-chrome|chrome|chromium)-.*';
+  const edgeExecRegex = '^Exec=\/.*\/(microsoft-edge|edge)-.*';
 
   let installations: Array<string> = [];
   if (canAccess(folder)) {
     // Output of the grep & print looks like:
-    //    /opt/google/chrome/google-chrome --profile-directory
-    //    /home/user/Downloads/chrome-linux/chrome-wrapper %U
+    //    /opt/google/edge/microsoft-edge --profile-directory
+    //    /home/user/Downloads/edge-linux/edge-wrapper %U
     let execPaths;
 
     // Some systems do not support grep -R so fallback to -r.
-    // See https://github.com/GoogleChrome/chrome-launcher/issues/46 for more context.
+    // See https://github.com/cezaraugusto/edge-launcher/issues/46 for more context.
     try {
       execPaths = execSync(
-          `grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
+          `grep -ER "${edgeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
     } catch (e) {
       execPaths = execSync(
-          `grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
+          `grep -Er "${edgeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
     }
 
     execPaths = execPaths.toString()

@@ -21,11 +21,11 @@ describe('Launcher', () => {
   });
 
   it('exposes expected interface when launched', async () => {
-    const chrome = await launch();
-    assert.notStrictEqual(chrome.process, undefined);
-    assert.notStrictEqual(chrome.pid, undefined);
-    assert.notStrictEqual(chrome.port, undefined);
-    assert.notStrictEqual(chrome.kill, undefined);
-    await chrome.kill();
+    const edge = await launch();
+    assert.notStrictEqual(edge.process, undefined);
+    assert.notStrictEqual(edge.pid, undefined);
+    assert.notStrictEqual(edge.port, undefined);
+    assert.notStrictEqual(edge.kill, undefined);
+    await edge.kill();
   });
 });

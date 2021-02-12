@@ -19,8 +19,8 @@ install:
 
 before_test:
   - set "PATH=C:\MinGW\msys\1.0\bin;%PATH%"
-  - set "LIGHTHOUSE_CHROMIUM_PATH=%CD%\chrome-win32\chrome.exe"
-  - bash ./scripts/download-chrome.sh
+  - set "LIGHTHOUSE_CHROMIUM_PATH=%CD%\edge-win32\edge.exe"
+  - bash ./scripts/download-edge.sh
   - yarn build
 
 test_script:
@@ -31,5 +31,5 @@ test_script:
   - yarn test
 
 cache:
-  #- chrome-win32 -> appveyor.yml,package.json
+  #- edge-win32 -> appveyor.yml,package.json
   - node_modules -> appveyor.yml,package.json,yarn.lock

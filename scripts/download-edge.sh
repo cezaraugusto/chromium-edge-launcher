@@ -6,7 +6,7 @@
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 ##
 
-# Download chrome inside of our CI env.
+# Download edge inside of our CI env.
 
 if [ "$APPVEYOR" == "True" ]; then
   url="https://download-chromium.appspot.com/dl/Win?type=snapshots"
@@ -20,7 +20,7 @@ if [ x"$LIGHTHOUSE_CHROMIUM_PATH" == x ]; then
 fi
 
 if [ -e "$LIGHTHOUSE_CHROMIUM_PATH" ]; then
-  echo "cached chrome found"
+  echo "cached edge found"
 else
-  wget "$url" --no-check-certificate -q -O chrome.zip && unzip chrome.zip
+  wget "$url" --no-check-certificate -q -O edge.zip && unzip edge.zip
 fi

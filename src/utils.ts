@@ -33,9 +33,9 @@ export class LauncherError extends Error {
   }
 }
 
-export class ChromePathNotSetError extends LauncherError {
+export class EdgePathNotSetError extends LauncherError {
   message =
-      'The CHROME_PATH environment variable must be set to a Chrome/Chromium executable no older than Chrome stable.';
+      'The EDGE_PATH environment variable must be set to a Edge/Chromium executable no older than Edge stable.';
   code = LaunchErrorCodes.ERR_LAUNCHER_PATH_NOT_SET;
 }
 
@@ -49,8 +49,8 @@ export class UnsupportedPlatformError extends LauncherError {
   code = LaunchErrorCodes.ERR_LAUNCHER_UNSUPPORTED_PLATFORM;
 }
 
-export class ChromeNotInstalledError extends LauncherError {
-  message = 'No Chrome installations found.';
+export class EdgeNotInstalledError extends LauncherError {
+  message = 'No Edge installations found.';
   code = LaunchErrorCodes.ERR_LAUNCHER_NOT_INSTALLED;
 }
 

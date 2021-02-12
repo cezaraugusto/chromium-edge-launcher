@@ -1,7 +1,7 @@
-# Chrome Flags for Tooling
+# Edge Flags for Tooling
 
-Many tools maintain a list of runtime flags for Chrome to configure the environment. This file
-is an attempt to document all chrome flags that are relevant to tools, automation, benchmarking, etc.
+Many tools maintain a list of runtime flags for Edge to configure the environment. This file
+is an attempt to document all edge flags that are relevant to tools, automation, benchmarking, etc.
 
 All use cases are different, so you'll have to choose which flags are most appropriate.
 
@@ -10,7 +10,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--disable-client-side-phishing-detection`: Disables client-side phishing detection
 * `--disable-component-extensions-with-background-pages`: Disable some built-in extensions that aren't affected by `--disable-extensions`
 * `--disable-default-apps`: Disable installation of default apps
-* `--disable-extensions`: Disable all chrome extensions
+* `--disable-extensions`: Disable all edge extensions
 * `--mute-audio`: Mute any audio
 * `--no-default-browser-check`: Disable the default browser check, do not prompt to set it as such
 * `--no-first-run`: Skip first run wizards
@@ -29,7 +29,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--disable-notifications`: Disables the Web Notification and the Push APIs.
 * `--disable-popup-blocking`: Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
 * `--disable-prompt-on-repost`: Reloading a page that came from a POST normally prompts the user.
-* `--disable-renderer-backgrounding`: This disables non-foreground tabs from getting a lower process priority This doesn't (on its own) affect timers or painting behavior. [karma-chrome-launcher#123](https://github.com/karma-runner/karma-chrome-launcher/issues/123)
+* `--disable-renderer-backgrounding`: This disables non-foreground tabs from getting a lower process priority This doesn't (on its own) affect timers or painting behavior. [karma-edge-launcher#123](https://github.com/karma-runner/karma-edge-launcher/issues/123)
 * `--js-flags=--random-seed=1157259157`: Initialize V8's RNG with a fixed seed.
 
 ## Test & debugging flags
@@ -47,12 +47,12 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--log-level=0`: 0 means INFO and higher.
 * `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. [chromium/linux/password_storage.md](https://chromium.googlesource.com/chromium/src/+/master/docs/linux/password_storage.md) https://crbug.com/571003
 * `--remote-debugging-pipe`: more secure than using protocol over a websocket
-* `--silent-debugger-extension-api`: Does not show an infobar when a Chrome extension attaches to a page using `chrome.debugger` page. Required to attach to extension background pages.
+* `--silent-debugger-extension-api`: Does not show an infobar when a Edge extension attaches to a page using `edge.debugger` page. Required to attach to extension background pages.
 * `--test-type`: Basically the 2014 version of `--enable-automation`. [codesearch](https://cs.chromium.org/search/?q=kTestType%5Cb&type=cs)
   - It avoids creating application stubs in ~/Applications on mac.
   - It makes exit codes slightly more correct
   - windows navigation jumplists arent updated https://crbug.com/389375
-  - doesn't start some chrome StartPageService
+  - doesn't start some edge StartPageService
   - disables initializing chromecast service
   - "Component extensions with background pages are not enabled during tests because they generate a lot of background behavior that can interfere."
   - when quitting the browser, it disables additional checks that may stop that quitting process. (like unsaved form modifications or unhandled profile notifications..)
@@ -62,7 +62,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 * `--disable-background-networking`: Disable various background network services, including extension updating,safe browsing service, upgrade detector, translate, UMA
 * `--disable-breakpad`: Disable crashdump collection (reporting is already disabled in Chromium)
-* `--disable-component-update`: Don't update the browser 'components' listed at chrome://components/
+* `--disable-component-update`: Don't update the browser 'components' listed at edge://components/
 * `--disable-domain-reliability`: Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
 * `--disable-sync`: Disable syncing to a Google account
 * `--enable-crash-reporter-for-testing`: Used for turning on Breakpad crash reporting in a debug environment where crash reporting is typically compiled but disabled.
@@ -121,14 +121,14 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 # Sources
 
-* [chrome-launcher's flags](https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts)
+* [edge-launcher's flags](https://github.com/cezaraugusto/edge-launcher/blob/master/src/flags.ts)
 * [Chromedriver's flags](https://cs.chromium.org/chromium/src/chrome/test/chromedriver/chrome_launcher.cc?type=cs&q=f:chrome_launcher++kDesktopSwitches&sq=package:chromium)
 * [Puppeteer's flags](https://github.com/puppeteer/puppeteer/blob/main/src/node/Launcher.ts)
 * [WebpageTest's flags](https://github.com/WPO-Foundation/wptagent/blob/master/internal/chrome_desktop.py)
 * [Catapult's flags](https://source.chromium.org/search?q=f:catapult%20f:desktop%20symbol:GetBrowserStartupArgs&ss=chromium%2Fchromium%2Fsrc)
-* [Karma's flags](https://github.com/karma-runner/karma-chrome-launcher/blob/master/index.js)
+* [Karma's flags](https://github.com/karma-runner/karma-edge-launcher/blob/master/index.js)
 
-# All Chrome flags
+# All Edge flags
 
 * [The canonical list of Chrome command-line switches on peter.sh](http://peter.sh/experiments/chromium-command-line-switches/) (maintained by the Chromium team)
 

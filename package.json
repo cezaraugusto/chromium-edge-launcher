@@ -1,5 +1,5 @@
 {
-  "name": "chrome-launcher",
+  "name": "edge-launcher",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
@@ -31,8 +31,8 @@
   },
   "version": "0.13.4",
   "types": "./dist/index.d.ts",
-  "description": "Launch latest Chrome with the Devtools Protocol port open",
-  "repository": "https://github.com/GoogleChrome/chrome-launcher/",
+  "description": "Launch latest Edge with the Devtools Protocol port open",
+  "repository": "https://github.com/cezaraugusto/edge-launcher/",
   "author": "The Chromium Authors",
   "license": "Apache-2.0"
 }

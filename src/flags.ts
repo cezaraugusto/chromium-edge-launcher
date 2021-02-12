@@ -5,19 +5,19 @@
  */
 'use strict';
 
-// https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md
+// https://github.com/cezaraugusto/edge-launcher/blob/master/docs/edge-flags-for-tools.md
 
 export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   // Disable built-in Google Translate service
   '--disable-features=Translate',
-  // Disable all chrome extensions
+  // Disable all edge extensions
   '--disable-extensions',
   // Disable some extensions that aren't affected by --disable-extensions
   '--disable-component-extensions-with-background-pages',
   // Disable various background network services, including extension updating,
   //   safe browsing service, upgrade detector, translate, UMA
   '--disable-background-networking',
-  // Don't update the browser 'components' listed at chrome://components/
+  // Don't update the browser 'components' listed at edge://components/
   '--disable-component-update',
   // Disables client-side phishing detection.
   '--disable-client-side-phishing-detection',

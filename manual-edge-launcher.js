@@ -5,22 +5,22 @@
 // TODO: have LH depend on this one.
 
 /**
- * @fileoverview Script to launch a clean Chrome instance on-demand.
+ * @fileoverview Script to launch a clean Edge instance on-demand.
  *
  * Assuming Lighthouse is installed globally or `npm link`ed, use via:
- *     chrome-debug
- * Optionally enable extensions or pass a port, additional chrome flags, and/or a URL
- *     chrome-debug --port=9222
- *     chrome-debug http://goat.com
- *     chrome-debug --show-paint-rects
- *     chrome-debug --enable-extensions
+ *     edge-debug
+ * Optionally enable extensions or pass a port, additional edge flags, and/or a URL
+ *     edge-debug --port=9222
+ *     edge-debug http://goat.com
+ *     edge-debug --show-paint-rects
+ *     edge-debug --enable-extensions
  */
 
-require('./compiled-check.js')('./dist/chrome-launcher.js');
-const {Launcher, launch} = require('./dist/chrome-launcher');
+require('./compiled-check.js')('./dist/edge-launcher.js');
+const {Launcher, launch} = require('./dist/edge-launcher');
 
 const args = process.argv.slice(2);
-const chromeFlags = [];
+const edgeFlags = [];
 let startingUrl;
 let port;
 let ignoreDefaultFlags;
@@ -32,13 +32,13 @@ if (args.length) {
   if (portFlag) port = parseInt(portFlag.replace('--port=', ''), 10);
 
   const enableExtensions = !!providedFlags.find(flag => flag === '--enable-extensions');
-  // The basic pattern for enabling Chrome extensions
+  // The basic pattern for enabling Edge extensions
   if (enableExtensions) {
     ignoreDefaultFlags = true;
-    chromeFlags.push(...Launcher.defaultFlags().filter(flag => flag !== '--disable-extensions'));
+    edgeFlags.push(...Launcher.defaultFlags().filter(flag => flag !== '--disable-extensions'));
   }
 
-  chromeFlags.push(...providedFlags);
+  edgeFlags.push(...providedFlags);
   startingUrl = args.find(flag => !flag.startsWith('--'));
 }
 
@@ -46,7 +46,7 @@ launch({
   startingUrl,
   port,
   ignoreDefaultFlags,
-  chromeFlags,
+  edgeFlags,
 })
 // eslint-disable-next-line no-console
-.then(v => console.log(`✨  Chrome debugging port: ${v.port}`));
+.then(v => console.log(`✨  Edge debugging port: ${v.port}`));

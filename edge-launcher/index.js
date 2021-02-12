@@ -1,4 +1,4 @@
 // This provides legacy support for a previously documented require pattern
-//    const chromeLauncher = require('chrome-launcher/chrome-launcher');
+//    const edgeLauncher = require('edge-launcher/edge-launcher');
 
 module.exports = require('../');

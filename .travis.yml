@@ -14,13 +14,13 @@ cache:
 install:
   - yarn
 before_script:
-  - export CHROME_PATH="$(pwd)/chrome-linux/chrome"
+  - export EDGE_PATH="$(pwd)/edge-linux/edge"
   - yarn build
 script:
   - yarn test-formatting
   - yarn type-check
   - yarn test
 addons:
-  chrome: stable
+  edge: stable
 services:
   - xvfb
