@@ -183,11 +183,6 @@ class Launcher {
     return edgeFinder[getPlatform() as SupportedPlatforms]()[0];
   }
 
-  /** Returns all available edge installations in decreasing priority order. */
-  static getInstallations() {
-    return edgeFinder[getPlatform() as SupportedPlatforms]();
-  }
-
   // Wrapper function to enable easy testing.
   makeTmpDir() {
     return makeTmpDir();

@@ -18,6 +18,7 @@ const fsMock = {
   writeFileSync: () => {}
 };
 
+// @ts-ignore
 const launchEdgeWithOpts = async (opts: Options = {}) => {
   const spawnStub = stub().returns({pid: 'some_pid'});
 
@@ -138,12 +139,6 @@ describe('Launcher', () => {
     const spawnStub = await launchEdgeWithOpts({ignoreDefaultFlags: true});
     const edgeFlags = spawnStub.getCall(0).args[1] as string[];
     assert.ok(!edgeFlags.includes('--disable-extensions'));
-  });
-
-  it('searches for available installations', async () => {
-    const installations = Launcher.getInstallations();
-    assert.ok(Array.isArray(installations));
-    assert.ok(installations.length >= 1);
   });
 
   it('removes --user-data-dir if userDataDir is false', async () => {
