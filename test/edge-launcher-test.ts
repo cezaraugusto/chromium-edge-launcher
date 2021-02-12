@@ -5,7 +5,7 @@
  */
 'use strict';
 
-import {Launcher, launch, killAll, Options} from '../src/chromium-edge-launcher';
+import {Launcher, launch, killAll, Options} from '../src/edge-launcher';
 import {DEFAULT_FLAGS} from '../src/flags';
 
 import {spy, stub} from 'sinon';
