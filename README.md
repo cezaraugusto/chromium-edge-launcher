@@ -1,4 +1,4 @@
-# Edge Launcher [![Linux Build Status](https://img.shields.io/travis/cezaraugusto/chromium-edge-launcher/master.svg)](https://travis-ci.org/cezaraugusto/chromium-edge-launcher) [![Windows Build Status](https://img.shields.io/appveyor/ci/cezaraugusto/chromium-edge-launcher/master.svg)](https://ci.appveyor.com/project/cezaraugusto/chromium-edge-launcher/branch/master) [![NPM chromium-edge-launcher package](https://img.shields.io/npm/v/chromium-edge-launcher.svg)](https://npmjs.org/package/chromium-edge-launcher)
+# Edge Launcher [![NPM chromium-edge-launcher package](https://img.shields.io/npm/v/chromium-edge-launcher.svg)](https://npmjs.org/package/chromium-edge-launcher)
 
 
 <img src="https://user-images.githubusercontent.com/4672033/107800563-adb9ce00-6d3d-11eb-8425-2256d0278894.png" align=right height=200>
