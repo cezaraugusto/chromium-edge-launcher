@@ -16,8 +16,8 @@
  *     edge-debug --enable-extensions
  */
 
-require('./compiled-check.js')('./dist/edge-launcher.js');
-const {Launcher, launch} = require('./dist/edge-launcher');
+require('./compiled-check.js')('./dist/chromium-edge-launcher.js');
+const {Launcher, launch} = require('./dist/chromium-edge-launcher');
 
 const args = process.argv.slice(2);
 const edgeFlags = [];

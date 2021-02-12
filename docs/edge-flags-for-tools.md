@@ -29,7 +29,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--disable-notifications`: Disables the Web Notification and the Push APIs.
 * `--disable-popup-blocking`: Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
 * `--disable-prompt-on-repost`: Reloading a page that came from a POST normally prompts the user.
-* `--disable-renderer-backgrounding`: This disables non-foreground tabs from getting a lower process priority This doesn't (on its own) affect timers or painting behavior. [karma-edge-launcher#123](https://github.com/karma-runner/karma-edge-launcher/issues/123)
+* `--disable-renderer-backgrounding`: This disables non-foreground tabs from getting a lower process priority This doesn't (on its own) affect timers or painting behavior. [karma-chromium-edge-launcher#123](https://github.com/karma-runner/karma-chromium-edge-launcher/issues/123)
 * `--js-flags=--random-seed=1157259157`: Initialize V8's RNG with a fixed seed.
 
 ## Test & debugging flags
@@ -121,12 +121,12 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 # Sources
 
-* [edge-launcher's flags](https://github.com/cezaraugusto/edge-launcher/blob/master/src/flags.ts)
+* [chromium-edge-launcher's flags](https://github.com/cezaraugusto/chromium-edge-launcher/blob/master/src/flags.ts)
 * [Chromedriver's flags](https://cs.chromium.org/chromium/src/chrome/test/chromedriver/chrome_launcher.cc?type=cs&q=f:chrome_launcher++kDesktopSwitches&sq=package:chromium)
 * [Puppeteer's flags](https://github.com/puppeteer/puppeteer/blob/main/src/node/Launcher.ts)
 * [WebpageTest's flags](https://github.com/WPO-Foundation/wptagent/blob/master/internal/chrome_desktop.py)
 * [Catapult's flags](https://source.chromium.org/search?q=f:catapult%20f:desktop%20symbol:GetBrowserStartupArgs&ss=chromium%2Fchromium%2Fsrc)
-* [Karma's flags](https://github.com/karma-runner/karma-edge-launcher/blob/master/index.js)
+* [Karma's flags](https://github.com/karma-runner/karma-chromium-edge-launcher/blob/master/index.js)
 
 # All Edge flags
 

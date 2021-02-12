@@ -5,7 +5,7 @@
  */
 'use strict';
 
-// https://github.com/cezaraugusto/edge-launcher/blob/master/docs/edge-flags-for-tools.md
+// https://github.com/cezaraugusto/chromium-edge-launcher/blob/master/docs/edge-flags-for-tools.md
 
 export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   // Disable built-in Google Translate service

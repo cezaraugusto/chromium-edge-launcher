@@ -249,7 +249,7 @@ function findEdgeExecutables(folder: string): Array<string> {
     let execPaths;
 
     // Some systems do not support grep -R so fallback to -r.
-    // See https://github.com/cezaraugusto/edge-launcher/issues/46 for more context.
+    // See https://github.com/GoogleChrome/chrome-launcher/issues/46 for more context.
     try {
       execPaths = execSync(
           `grep -ER "${edgeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
