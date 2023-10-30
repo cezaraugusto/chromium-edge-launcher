@@ -181,8 +181,8 @@ export function wsl() {
 export function win32() {
   const installations: Array<string> = [];
   const suffixes = [
-    `${path.sep}Microsoft${path.sep}Edge SxS${path.sep}Application${path.sep}edge.exe`,
-    `${path.sep}Microsoft${path.sep}Edge${path.sep}Application${path.sep}edge.exe`
+    `${path.sep}Microsoft${path.sep}Edge SxS${path.sep}Application${path.sep}msedge.exe`,
+    `${path.sep}Microsoft${path.sep}Edge${path.sep}Application${path.sep}msedge.exe`
   ];
   const prefixes = [
     process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']
