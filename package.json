@@ -29,7 +29,7 @@
     "mkdirp": "^1.0.4",
     "rimraf": "^3.0.2"
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
   "types": "./dist/index.d.ts",
   "description": "Launch latest Edge with the Devtools Protocol port open",
   "repository": "https://github.com/cezaraugusto/chromium-edge-launcher/",
