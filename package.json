@@ -27,7 +27,7 @@
     "lighthouse-logger": "^1.0.0",
     "mkdirp": "^1.0.4"
   },
-  "version": "0.2.0",
+  "version": "0.3.0",
   "types": "./dist/index.d.ts",
   "description": "Launch latest Edge with the Devtools Protocol port open",
   "repository": "https://github.com/cezaraugusto/chromium-edge-launcher/",
