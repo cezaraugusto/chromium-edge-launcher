@@ -15,7 +15,8 @@ const log = require('lighthouse-logger');
 const fsMock = {
   openSync: () => {},
   closeSync: () => {},
-  writeFileSync: () => {}
+  writeFileSync: () => {},
+  rmdir: () => {},
 };
 
 // @ts-ignore
@@ -23,7 +24,7 @@ const launchEdgeWithOpts = async (opts: Options = {}) => {
   const spawnStub = stub().returns({pid: 'some_pid'});
 
   const edgeInstance =
-      new Launcher(opts, {fs: fsMock as any, rimraf: spy() as any, spawn: spawnStub as any});
+      new Launcher(opts, {fs: fsMock as any, spawn: spawnStub as any});
   stub(edgeInstance, 'waitUntilReady').returns(Promise.resolve());
 
   edgeInstance.prepare();
@@ -54,24 +55,25 @@ describe('Launcher', () => {
   });
 
   it('accepts and uses a custom path', async () => {
-    const rimrafMock = spy();
+    const fs = {...fsMock, rmdir: spy()};
     const edgeInstance =
-        new Launcher({userDataDir: 'some_path'}, {fs: fsMock as any, rimraf: rimrafMock as any});
+        new Launcher({userDataDir: 'some_path'}, {fs: fs as any});
 
     edgeInstance.prepare();
 
     await edgeInstance.destroyTmp();
-    assert.strictEqual(rimrafMock.callCount, 0);
+    assert.strictEqual(fs.rmdir.callCount, 0);
   });
 
   it('cleans up the tmp dir after closing', async () => {
-    const rimrafMock = stub().callsFake((_, done) => done());
+    const rmdirMock = stub().callsFake((_path, _options, done) => done());
+    const fs = {...fsMock, rmdir: rmdirMock};
 
-    const edgeInstance = new Launcher({}, {fs: fsMock as any, rimraf: rimrafMock as any});
+    const edgeInstance = new Launcher({}, {fs: fs as any});
 
     edgeInstance.prepare();
     await edgeInstance.destroyTmp();
-    assert.strictEqual(rimrafMock.callCount, 1);
+    assert.strictEqual(fs.rmdir.callCount, 1);
   });
 
   it('does not delete created directory when custom path passed', () => {
