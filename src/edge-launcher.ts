@@ -216,8 +216,7 @@ class Launcher {
         return await this.isDebuggerReady();
       } catch (err) {
         log.log(
-            'EdgeLauncher',
-            `No debugging port found on port ${this.port}, launching a new Edge.`);
+            'EdgeLauncher', `No debugging port found on port ${this.port}, launching a new Edge.`);
       }
     }
     if (this.edgePath === undefined) {
@@ -253,8 +252,7 @@ class Launcher {
         this.port = await getRandomPort();
       }
 
-      log.verbose(
-          'EdgeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
+      log.verbose('EdgeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
       const edge = this.spawn(
           execPath, this.flags,
           {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
@@ -321,8 +319,7 @@ class Launcher {
                 log.error('EdgeLauncher', err.message);
                 const stderr =
                     this.fs.readFileSync(`${this.userDataDir}/edge-err.log`, {encoding: 'utf-8'});
-                log.error(
-                    'EdgeLauncher', `Logging contents of ${this.userDataDir}/edge-err.log`);
+                log.error('EdgeLauncher', `Logging contents of ${this.userDataDir}/edge-err.log`);
                 log.error('EdgeLauncher', stderr);
                 return reject(err);
               }

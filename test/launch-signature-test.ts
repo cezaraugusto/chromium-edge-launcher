@@ -6,6 +6,7 @@
 
 'use strict';
 
+// @ts-ignore
 import {launch} from '../src/';
 import * as assert from 'assert';
 
