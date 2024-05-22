@@ -252,7 +252,7 @@ class Launcher {
           {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
       this.edge = edge;
 
-      this.fs.writeFileSync(this.pidFile, edge.pid.toString());
+      this.fs.writeFileSync(this.pidFile, edge.pid!.toString());
 
       log.verbose('EdgeLauncher', `Edge running with pid ${edge.pid} on port ${this.port}.`);
       return edge.pid;
@@ -339,7 +339,7 @@ class Launcher {
             // if you don't explicitly set `stdio`
             execSync(`taskkill /pid ${this.edge.pid} /T /F`, {stdio: 'pipe'});
           } else {
-            process.kill(-this.edge.pid);
+            process.kill(-this.edge.pid!);
           }
         } catch (err) {
           const message = `Edge could not be killed ${err.message}`;
