@@ -5,14 +5,14 @@
  */
 'use strict';
 
-import fs = require('fs');
-import path = require('path');
+import fs from 'fs';
+import path from 'path';
 import {homedir} from 'os';
 import {execSync, execFileSync} from 'child_process';
-import escapeRegExp = require('escape-string-regexp');
-const log = require('lighthouse-logger');
+import escapeRegExp from 'escape-string-regexp';
+import log from 'lighthouse-logger';
 
-import {getLocalAppDataPath, EdgePathNotSetError} from './utils';
+import {getWSLLocalAppDataPath, toWSLPath, EdgePathNotSetError} from './utils.js';
 
 const newLineRegex = /\r?\n/;
 
@@ -25,6 +25,7 @@ export function darwinFast(): string|undefined {
   const priorityOptions: Array<string|undefined> = [
     process.env.EDGE_PATH,
     process.env.LIGHTHOUSE_CHROMIUM_PATH,
+    '/Applications/Microsoft Edge Canary.app/Contents/MacOS/Microsoft Edge Canary',
     '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
   ];
 
@@ -36,7 +37,7 @@ export function darwinFast(): string|undefined {
 }
 
 export function darwin() {
-  const suffixes = ['/Contents/MacOS/Google Edge'];
+  const suffixes = ['/Contents/MacOS/Microsoft Edge Canary', '/Contents/MacOS/Microsoft Edge'];
 
   const LSREGISTER = '/System/Library/Frameworks/CoreServices.framework' +
       '/Versions/A/Frameworks/LaunchServices.framework' +
@@ -51,7 +52,7 @@ export function darwin() {
 
   execSync(
       `${LSREGISTER} -dump` +
-      ' | grep -i \'microsoft edge\\?\\.app\'' +
+      ' | grep -i \'microsoft edge\\( canary\\)\\?\\.app\'' +
       ' | awk \'{$1=""; print $0}\'')
       .toString()
       .split(newLineRegex)
@@ -70,8 +71,11 @@ export function darwin() {
   const home = escapeRegExp(process.env.HOME || homedir());
   const priorities: Priorities = [
     {regex: new RegExp(`^${home}/Applications/.*Edge\\.app`), weight: 50},
+    {regex: new RegExp(`^${home}/Applications/.*Edge Canary\\.app`), weight: 51},
     {regex: /^\/Applications\/.*Edge.app/, weight: 100},
+    {regex: /^\/Applications\/.*Edge Canary.app/, weight: 101},
     {regex: /^\/Volumes\/.*Edge.app/, weight: -2},
+    {regex: /^\/Volumes\/.*Edge Canary.app/, weight: -1},
   ];
 
   if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
@@ -153,8 +157,8 @@ export function linux() {
     {regex: /edge-wrapper$/, weight: 51},
     {regex: /microsoft-edge-stable$/, weight: 50},
     {regex: /microsoft-edge$/, weight: 49},
-    {regex: /edge-browser$/, weight: 48},
-    {regex: /edge$/, weight: 47},
+    {regex: /chromium-browser$/, weight: 48},
+    {regex: /chromium$/, weight: 47},
   ];
 
   if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
@@ -171,9 +175,10 @@ export function linux() {
 
 export function wsl() {
   // Manually populate the environment variables assuming it's the default config
-  process.env.LOCALAPPDATA = getLocalAppDataPath(`${process.env.PATH}`);
-  process.env.PROGRAMFILES = '/mnt/c/Program Files';
-  process.env['PROGRAMFILES(X86)'] = '/mnt/c/Program Files (x86)';
+  process.env.LOCALAPPDATA = getWSLLocalAppDataPath(`${process.env.PATH}`);
+  process.env.PROGRAMFILES = toWSLPath('C:/Program Files', '/mnt/c/Program Files');
+  process.env['PROGRAMFILES(X86)'] =
+      toWSLPath('C:/Program Files (x86)', '/mnt/c/Program Files (x86)');
 
   return win32();
 }
@@ -239,12 +244,12 @@ function uniq(arr: Array<any>) {
 
 function findEdgeExecutables(folder: string): Array<string> {
   const argumentsRegex = /(^[^ ]+).*/; // Take everything up to the first space
-  const edgeExecRegex = '^Exec=\/.*\/(microsoft-edge|edge)-.*';
+  const edgeExecRegex = '^Exec=\/.*\/(microsoft-edge|edge|chromium)-.*';
 
   let installations: Array<string> = [];
   if (canAccess(folder)) {
     // Output of the grep & print looks like:
-    //    /opt/google/edge/microsoft-edge --profile-directory
+    //    /opt/microsoft/edge/microsoft-edge --profile-directory
     //    /home/user/Downloads/edge-linux/edge-wrapper %U
     let execPaths;
 
