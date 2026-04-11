@@ -15,9 +15,9 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
 		[
 			// Disable built-in Google Translate service
 			"Translate",
-			// Disable the Chrome Optimization Guide background networking
+			// Disable the Optimization Guide background networking
 			"OptimizationHints",
-			//  Disable the Chrome Media Router (cast target discovery) background networking
+			//  Disable the Media Router (cast target discovery) background networking
 			"MediaRouter",
 			/// Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_. This is a sub-component of the MediaRouter.
 			"DialMediaRouteProvider",
@@ -29,8 +29,10 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
 			"CertificateTransparencyComponentUpdater",
 			// Disables autofill server communication. This feature isn't disabled via other 'parent' flags.
 			"AutofillServerCommunication",
-			// Disables "Enhanced ad privacy in Chrome" dialog (though as of 2024-03-20 it shouldn't show up if the profile has no stored country).
+			// Disables "Enhanced ad privacy" dialog (though as of 2024-03-20 it shouldn't show up if the profile has no stored country).
 			"PrivacySandboxSettings4",
+			// Disable RenderDocument until remaining bugs are fixed. https://github.com/GoogleChrome/lighthouse/pull/16363
+			"RenderDocument",
 		].join(","),
 
 	// Disable all edge extensions

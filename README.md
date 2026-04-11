@@ -11,7 +11,7 @@ Launch Microsoft Edge with ease from node.
 * Binds `Ctrl-C` (by default) to terminate the Edge process
 * Exposes a small set of [options](#api) for configurability over these details
 
-Once launched, interacting with the browser must be done over the [devtools protocol](https://chromedevtools.github.io/devtools-protocol/), typically via [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface/). For many cases [Puppeteer](https://github.com/GoogleChrome/puppeteer) is recommended, though it has its own chrome launching mechanism.
+Once launched, interacting with the browser must be done over the [devtools protocol](https://chromedevtools.github.io/devtools-protocol/), typically via [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface/). For many cases [Puppeteer](https://github.com/GoogleChrome/puppeteer) is recommended, though it has its own browser launching mechanism.
 
 ### Installing
 
@@ -73,7 +73,7 @@ npm install chromium-edge-launcher
 
   // (optional) Logging level
   // Default: 'silent'
-  logLevel: 'verbose'|'info'|'error'|'silent';
+  logLevel: 'verbose'|'info'|'error'|'warn'|'silent';
 
   // (optional) Flags specific in [flags.ts](src/flags.ts) will not be included.
   // Typically used with the defaultFlags() method and edgeFlags option.
@@ -88,7 +88,7 @@ npm install chromium-edge-launcher
   // Default: 50
   maxConnectionRetries: number;
 
-  // (optional) A dict of environmental key value pairs to pass to the spawned chrome process.
+  // (optional) A dict of environmental key value pairs to pass to the spawned edge process.
   envVars: {[key: string]: string};
 };
 ```
@@ -102,7 +102,7 @@ npm install chromium-edge-launcher
 edge.port: number;
 
 // Method to kill Edge (and cleanup the profile folder)
-edge.kill: () => Promise<void>;
+edge.kill: () => void;
 
 // The process id
 edge.pid: number;
@@ -136,32 +136,43 @@ Note: This method performs synchronous I/O operations.
 
 ### `.killAll()`
 
-Attempts to kill all Edge instances created with [`.launch([opts])`](#launchopts). Returns a Promise that resolves to an array of errors that occurred while killing instances. If all instances were killed successfully, the array will be empty.
+Attempts to kill all Edge instances created with [`.launch([opts])`](#launchopts). Returns an array of errors that occurred while killing instances. If all instances were killed successfully, the array will be empty.
 
 ```js
 import * as EdgeLauncher from 'chromium-edge-launcher';
 
-async function cleanup() {
-  await EdgeLauncher.killAll();
+function cleanup() {
+  const errors = EdgeLauncher.killAll();
 }
+```
+
+### `.getEdgePath()`
+
+Returns a `string` with the path to the Edge installation that will be used by default when launching. Throws if no installation is found.
+
+```js
+import * as EdgeLauncher from 'chromium-edge-launcher';
+
+const edgePath = EdgeLauncher.getEdgePath();
+console.log(edgePath);
 ```
 
 ## Examples
 
-#### Launching chrome:
+#### Launching Edge:
 
 ```js
 import * as EdgeLauncher from 'chromium-edge-launcher';
 
 EdgeLauncher.launch({
   startingUrl: 'https://google.com'
-}).then(chrome => {
-  console.log(`Edge debugging port running on ${chrome.port}`);
+}).then(edge => {
+  console.log(`Edge debugging port running on ${edge.port}`);
 });
 ```
 
 
-#### Launching headless chrome:
+#### Launching headless Edge:
 
 ```js
 import * as EdgeLauncher from 'chromium-edge-launcher';
@@ -169,8 +180,8 @@ import * as EdgeLauncher from 'chromium-edge-launcher';
 EdgeLauncher.launch({
   startingUrl: 'https://google.com',
   edgeFlags: ['--headless', '--disable-gpu']
-}).then(chrome => {
-  console.log(`Edge debugging port running on ${chrome.port}`);
+}).then(edge => {
+  console.log(`Edge debugging port running on ${edge.port}`);
 });
 ```
 
@@ -184,7 +195,7 @@ const newFlags = EdgeLauncher.Launcher.defaultFlags().filter(flag => flag !== '-
 EdgeLauncher.launch({
   ignoreDefaultFlags: true,
   edgeFlags: newFlags,
-}).then(chrome => { ... });
+}).then(edge => { ... });
 ```
 
 To programatically load an extension at runtime, use `--remote-debugging-pipe`
@@ -192,20 +203,10 @@ as shown in [test/load-extension-test.ts](test/load-extension-test.ts).
 
 ### Continuous Integration
 
-In a CI environment like Travis, Edge may not be installed. If you want to use `chromium-edge-launcher`, Travis can [install Edge at run time with an addon](https://docs.travis-ci.com/user/chrome).  Alternatively, you can also install Edge using the [`download-edge.sh`](https://raw.githubusercontent.com/GoogleChrome/chromium-edge-launcher/v0.8.0/scripts/download-chrome.sh) script.
-
-Then in `.travis.yml`, use it like so:
+In a CI environment like GitHub Actions, Edge may not be installed. You can set the `EDGE_PATH` environment variable to point to a Chromium-based browser binary, or install Edge as part of your CI setup.
 
 ```yaml
-language: node_js
-install:
-  - yarn install
-before_script:
-  - export DISPLAY=:99.0
-  - export EDGE_PATH="$(pwd)/chrome-linux/chrome"
-  - sh -e /etc/init.d/xvfb start
-  - sleep 3 # wait for xvfb to boot
-
-addons:
-  chrome: stable
+# Example GitHub Actions setup
+- name: Set Edge path
+  run: export EDGE_PATH=$(which microsoft-edge-stable || which microsoft-edge)
 ```
