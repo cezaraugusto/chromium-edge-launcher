@@ -6,7 +6,7 @@
 'use strict';
 
 import {createServer} from 'http';
-import {AddressInfo} from 'net';
+import type {AddressInfo} from 'net';
 
 /**
  * Return a random, unused port.

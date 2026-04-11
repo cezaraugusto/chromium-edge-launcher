@@ -12,7 +12,7 @@ import * as edgeFinder from './edge-finder.js';
 import {getRandomPort} from './random-port.js';
 import {DEFAULT_FLAGS} from './flags.js';
 import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, EdgeNotInstalledError} from './utils.js';
-import {ChildProcess} from 'child_process';
+import type {ChildProcess} from 'child_process';
 import {spawn, spawnSync} from 'child_process';
 import log from 'lighthouse-logger';
 
