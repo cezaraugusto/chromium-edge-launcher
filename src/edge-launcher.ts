@@ -177,8 +177,7 @@ class Launcher {
     }
 
     // Using startsWith because it could also be --remote-debugging-pipe=cbor
-    this.useRemoteDebuggingPipe =
-        this.edgeFlags.some(f => f.startsWith('--remote-debugging-pipe'));
+    this.useRemoteDebuggingPipe = this.edgeFlags.some(f => f.startsWith('--remote-debugging-pipe'));
   }
 
   private get flags() {
@@ -291,8 +290,7 @@ class Launcher {
         }
 
         log.log(
-            'EdgeLauncher',
-            `No debugging port found on port ${this.port}, launching a new Edge.`);
+            'EdgeLauncher', `No debugging port found on port ${this.port}, launching a new Edge.`);
       }
     }
     if (this.edgePath === undefined) {
@@ -333,8 +331,7 @@ class Launcher {
         }
       }
 
-      log.verbose(
-          'EdgeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
+      log.verbose('EdgeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
       this.edgeProcess = this.spawn(execPath, this.flags, {
         // On non-windows platforms, `detached: true` makes child process a leader of a new
         // process group, making it possible to kill child process tree with `.kill(-pid)` command.
@@ -357,8 +354,7 @@ class Launcher {
       }
 
       log.verbose(
-          'EdgeLauncher',
-          `Edge running with pid ${this.edgeProcess.pid} on port ${this.port}.`);
+          'EdgeLauncher', `Edge running with pid ${this.edgeProcess.pid} on port ${this.port}.`);
       return this.edgeProcess.pid;
     })();
 
@@ -424,8 +420,7 @@ class Launcher {
                 log.error('EdgeLauncher', err.message);
                 const stderr =
                     this.fs.readFileSync(`${this.userDataDir}/edge-err.log`, {encoding: 'utf-8'});
-                log.error(
-                    'EdgeLauncher', `Logging contents of ${this.userDataDir}/edge-err.log`);
+                log.error('EdgeLauncher', `Logging contents of ${this.userDataDir}/edge-err.log`);
                 log.error('EdgeLauncher', stderr);
                 return reject(err);
               }

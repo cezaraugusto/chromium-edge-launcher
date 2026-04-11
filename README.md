@@ -1,6 +1,6 @@
 # Edge Launcher [![GitHub Actions Status Badge](https://github.com/cezaraugusto/chromium-edge-launcher/workflows/🛠/badge.svg)](https://github.com/cezaraugusto/chromium-edge-launcher/actions) [![NPM chromium-edge-launcher package](https://img.shields.io/npm/v/chromium-edge-launcher.svg)](https://npmjs.org/package/chromium-edge-launcher)
 
-<img src="https://user-images.githubusercontent.com/39191/29847271-a7ba82f8-8ccf-11e7-8d54-eb88fdf0b6d0.png" align=right height=200>
+<img src="https://user-images.githubusercontent.com/4672033/107800563-adb9ce00-6d3d-11eb-8425-2256d0278894.png" align=right height=200>
 
 Launch Microsoft Edge with ease from node.
 
