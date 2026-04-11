@@ -28,7 +28,7 @@
     "typescript": "^4.1.2"
   },
   "dependencies": {
-    "@types/node": "*",
+    "@types/node": "^18.0.0",
     "escape-string-regexp": "^4.0.0",
     "is-wsl": "^2.2.0",
     "lighthouse-logger": "^2.0.1"
